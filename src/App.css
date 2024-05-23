@@ -1,0 +1,222 @@
+* {
+  box-sizing : border-box;
+  margin : 0
+}
+
+p {
+  min-height : 18px;
+}
+
+body {
+  background-color: #212121;
+  color : #DDD;
+  width : 100%;
+  height : 100%;
+  overflow : hidden;
+}
+
+#root {
+  width: 100%;
+  height : 100%;
+  margin: 0 auto;
+}
+
+#site-header {
+  position : absolute;
+  display : flex;
+  align-items : center;
+  justify-content : center;
+  background-color: #242424;
+  top : 0;
+  left : 0;
+  width : 100%;
+  margin-bottom: 12px;
+  box-shadow : 5px 5px 8px -1px rgba(0,0,0,0.35);
+  z-index : 10;
+}
+
+.title {
+  position : absolute;
+  background-image : url('images/arte_concert_timeline.png');
+  background-position: center;
+  background-repeat: no-repeat;
+  top : 5px;
+  left : 0;
+  width: 357px;
+  height: 38px;
+}
+
+.hint {
+  position : absolute;
+  top : 1px;
+  right : 5px;
+  font-size : 12px;
+}
+
+.hint .yellow {
+  color : #FC2;
+}
+
+.hint .green {
+  color : #5a2;
+}
+
+.hint.second {
+  top : 30px;
+}
+
+#grid-element {
+  position : relative;
+}
+
+#streams-overlay {
+  position : absolute;
+}
+
+.line.hour {
+  border : 1px #363636 solid;
+  border-width : 1px 0px 0px 0px;
+}
+
+.line.hour .hour-text {
+  font-size : 12px;
+  width : 3.1em;
+  margin-top : -1.2em;
+  padding : 4px;
+}
+
+.line.hour .day-text {
+  font-size : 14px;
+  font-weight : bold;
+  padding : 4px;
+}
+
+.line.hour .columns {
+  margin-top : -42px;
+}
+
+.line.hour .column {
+  display : inline-block;
+  border: 1px #363636 solid;
+  border-width : 0px 1px 0px 0px
+}
+
+.line.hour .column:first-child {
+  border-width : 0px 1px 0px 1px
+}
+
+.line.hour .sub-division {
+  border: 1px #303030 solid;
+  border-width : 0px 0px 1px 0px
+}
+
+.zoom-tool  {
+  background-color : #202020;
+  position : absolute;
+  top : 0px;
+  border : 1px #444 inset;
+  border-radius : 7px;
+}
+
+.zoom-tool-button {
+  position : absolute;
+  border : 1px #AAA dotted;
+  border-radius : 7px;
+}
+
+.zoom-tool-inner-button  {
+  position : absolute;
+  top : 0px;
+  border : 1px #444 dashed;
+  border-radius : 7px;
+  cursor : pointer;
+}
+
+.zoom-tool-inner-button:nth-child(2)  {
+  border : 0px;
+  padding: 0px 0px 0px 4px;
+  line-height: 16px;
+}
+
+.zoom-tool-inner-button:nth-child(1), .zoom-tool-inner-button:nth-child(3)  {
+  font-size : 10px;
+  background-color : #282828;
+  padding: 0px 0px 0px 3px;
+  line-height: 16px;
+}
+
+.cards-overlay {
+  position : absolute;
+  top : 0;
+}
+
+.stream-card {
+  position : absolute;
+  background-color : #282828;
+  border-radius : 0px 0px 4px 4px;
+  box-shadow : 5px 5px 8px -1px rgba(0,0,0,0.35);
+  overflow : hidden;
+  cursor : pointer;
+}
+
+.stream-flag {
+  background-color : #5a2;
+  height : 5px;
+}
+
+.stream-flag.is-fictive {
+  background-color : #FC2;
+}
+
+.stream-card p {
+  font-size : 12px
+}
+
+label.for-checkbox {
+  margin-left : 25px;
+}
+
+.checkbox {
+  background-color : #202020;
+  width : 34px;
+  height : 18px;
+  margin-left : 5px;
+  border-radius : 9px;
+  border : 1px #555 inset;
+  cursor : pointer;
+}
+
+.checkbox-button {
+  background-color : #BABABA;
+  width : 14px;
+  height : 14px;
+  margin-top : 1px;
+  border-radius : 7px;
+  border : 1px #444 solid;
+}
+
+.checkbox-button[data-checked="true"] {
+  margin-left : 16px;
+}
+
+.displayed-hour {
+  position : absolute;
+  left : 0;
+  font-size : 24px;
+  color : #A22;
+  padding : 2px 12px;
+  border : 3px #A22 solid;
+  border-radius : 9px;
+}
+
+#triangle {
+  position : absolute;
+  left : 89px;
+  height : 0;
+  width : 0;
+  border-top : 6px solid transparent;
+  border-bottom : 6px solid transparent;
+  border-left : 10px solid #A22;
+ }
+ 
+ 
