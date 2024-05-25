@@ -187,20 +187,23 @@ label.for-checkbox {
 }
 
 .checkbox-button {
-  background-color : #BABABA;
+  background-color : #5A5A5A;
   width : 14px;
   height : 14px;
   margin-top : 1px;
+  margin-left: 2px;
   border-radius : 7px;
   border : 1px #444 solid;
 }
 
 .checkbox-button[data-checked="true"] {
+  background-color : #BABABA;
   margin-left : 16px;
 }
 
 .displayed-hour {
   position : absolute;
+  background-color : #282828DA;
   left : 0;
   font-size : 24px;
   color : #A22;

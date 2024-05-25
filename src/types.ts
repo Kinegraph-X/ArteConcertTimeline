@@ -85,7 +85,7 @@ type settings = {
     stdMargin : number,
     displayedHourHeight : number,
     triangleHeight : number,
-    stdCardHeight : number,
+    stdCardDuration : number,
     cardThumbnailImgHeight : number,
     cardThumbnailImgwidth : number,
     upcomingGridColor : string,

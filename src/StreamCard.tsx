@@ -17,7 +17,7 @@ const StreamCard = function(props:streamCardProps) {
             + 'px',
         width : props.columnWidth + 'px',
         height : props.livestreamDesc.duration < 20  * 60 || props.livestreamDesc.duration > 240  * 60
-            ? settings.stdCardHeight
+            ? props.lineHeight * settings.stdCardDuration / 3600
             : props.lineHeight * props.livestreamDesc.duration / 3600
     }
     // console.log(

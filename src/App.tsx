@@ -35,13 +35,17 @@ function App() {
   */
   useEffect(() => {
     const fetchFunction = function() {
-      fetch('/_arteconcert_dom_crawler/dom_crawler.php').then((response) => { // http://localhost:80
+      let backendUrl = '';
+      if (window.location.href.match(/localhost/))
+        backendUrl = 'http://localhost:80';
+
+      fetch(backendUrl + '/_arteconcert_dom_crawler/dom_crawler.php').then((response) => { // http://localhost:80
         response.json().then((data:streamData[]) => {
           setStreamsData(data);
         });
       });
     }
-    setInterval(fetchFunction, 30 * 1000);
+    setInterval(fetchFunction, 10 * 1000);
     fetchFunction();
     addEventListener("resize", (event) => {
       setColumnWidth((window.innerWidth - pageWidthPreCalc) / currentColumnCount);
@@ -123,11 +127,13 @@ function App() {
                             || key > (currentDate.getHours())
                               ? settings.upcomingGridColor
                               : 'transparent';
+                          // keep the node to have the correct background, but don't set the border to avoir rounding issues on the last line
                           return (
                             <div className="sub-division" style={{
                               width : (columnWidth - 2) + 'px',
                               height : lineHeight / 6 + 'px',
-                              backgroundColor : backgroundColor
+                              backgroundColor : backgroundColor,
+                              borderWidth : idx < 5 ? '0px 0px 1px 0px' : '0px'
                             }}></div>
                           )
                         })}
@@ -148,7 +154,7 @@ function App() {
         {streamsData.map(function(streamData) {
           if (activeColumns[streamData.stream_channel])
             return <StreamCard
-              key={streamData.stream_channel + '-' + streamData.date}
+              key={streamData.title}
               todayMidnight={todayMidnight}
               livestreamDesc={streamData}
               columnWidth={columnWidth}
