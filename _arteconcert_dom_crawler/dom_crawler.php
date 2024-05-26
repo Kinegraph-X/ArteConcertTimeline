@@ -4,6 +4,16 @@ require 'vendor/autoload.php';
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\CssSelector\CssSelectorConverter;
 date_default_timezone_set('Europe/Paris');
+$current_timestamp = (new DateTime())->getTimestamp();
+$cache_file_name = 'cached_events.json';
+
+if (($cache_contents = @file_get_contents($cache_file_name))) {
+    $cache_contents = json_decode($cache_contents, true);
+    if (($cache_contents['timestamp']  + 60 * 60) > $current_timestamp && $cache_contents['events']) {
+        serve_result($cache_contents['events']);
+        exit;
+    }
+}
 
 // create curl resource $ch = curl_handle
 $ch = curl_init();
@@ -148,7 +158,7 @@ foreach($events as $key => $event) {
         // non-live events have a stream-url containing the m3u8 pointing to the replay, let's include it
         $events[$key]['stream_m3u_URL'] = $result['data']['attributes']['streams'][0]['url'];
         preg_match('#channel(\d+)#', $events[$key]['stream_m3u_URL'], $stream_channel);
-        // nor have they the word "channel" in the url, so prevent an errpr
+        // and they don't have the word "channel" in the url, so prevent an errpr
         if ($stream_channel)
             $events[$key]['stream_channel'] = intval($stream_channel[1]);
         else
@@ -158,6 +168,13 @@ foreach($events as $key => $event) {
         $events[$key]['stream_channel'] = 0;
 }
 // echo '<br/>'.date('Z').'<br/>';
+
+$cached_content = [
+    'timestamp' => $current_timestamp,
+    'events' => $events
+];
+save_file($cached_content, $cache_file_name);
+serve_result($events);
 
 function convertToTimestamp($dateStr) {
     global $months;
@@ -172,14 +189,25 @@ function convertToTimestamp($dateStr) {
     return null; // Return null if date conversion fails
 }
 
-// Set the MIME type for the JSON 
-header('Access-Control-Allow-Origin: *');
-header('Content-Type: application/json');
-echo json_encode($events, JSON_PRETTY_PRINT);
+
 
 function send_response($message) {
     header('Content-Type: application/json');
     echo json_encode($message);
     exit;
+}
+
+function save_file($content,$filename) {
+    $fp = fopen($filename, "w+");
+    fwrite($fp,json_encode($content, JSON_PRETTY_PRINT));
+//     fwrite($fp,$content);
+    fclose($fp);
+}
+
+function serve_result($contents) {
+    // Set the MIME type for the JSON
+    header('Access-Control-Allow-Origin: *');
+    header('Content-Type: application/json');
+    echo json_encode($contents, JSON_PRETTY_PRINT);
 }
 ?>
