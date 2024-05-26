@@ -45,7 +45,7 @@ function App() {
         });
       });
     }
-    // setInterval(fetchFunction, 10 * 1000);
+    setInterval(fetchFunction, 10 * 1000);
     fetchFunction();
     addEventListener("resize", (event) => {
       setColumnWidth((window.innerWidth - pageWidthPreCalc) / currentColumnCount);
