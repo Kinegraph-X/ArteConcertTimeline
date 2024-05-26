@@ -29,17 +29,15 @@ const StreamCard = function(props:streamCardProps) {
     //     streamCardStyle.top);
 
     return (
-        <>
-            <div className='stream-card' style={streamCardStyle}>
-                <a href={props.livestreamDesc.public_page}>
-                    <div className={'stream-flag' + (props.livestreamDesc.is_fictive ? ' is-fictive' : '')}></div>
-                    <p className="stream-title">{props.livestreamDesc.title}</p>
-                    <p className="stream-subtitle">{props.livestreamDesc.subtitle}</p>
-                    <p className="stream-date">{props.livestreamDesc.HR_date}</p>
-                    <img src={props.livestreamDesc.thumbnail} width={props.columnWidth} height={props.columnWidth * settings.cardThumbnailImgHeight / settings.cardThumbnailImgwidth}/>
-                </a>    
-            </div>
-        </>
+        <div className='stream-card' style={streamCardStyle}>
+            <a href={props.livestreamDesc.public_page}>
+                <div className={'stream-flag' + (props.livestreamDesc.is_fictive ? ' is-fictive' : '')}></div>
+                <p className="stream-title">{props.livestreamDesc.title}</p>
+                <p className="stream-subtitle">{props.livestreamDesc.subtitle}</p>
+                <p className="stream-date">{props.livestreamDesc.HR_date}</p>
+                <img src={props.livestreamDesc.thumbnail} width={props.columnWidth} height={props.columnWidth * settings.cardThumbnailImgHeight / settings.cardThumbnailImgwidth}/>
+            </a>    
+        </div>
     )
 }
 

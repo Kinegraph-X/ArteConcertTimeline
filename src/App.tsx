@@ -45,7 +45,7 @@ function App() {
         });
       });
     }
-    setInterval(fetchFunction, 10 * 1000);
+    // setInterval(fetchFunction, 10 * 1000);
     fetchFunction();
     addEventListener("resize", (event) => {
       setColumnWidth((window.innerWidth - pageWidthPreCalc) / currentColumnCount);
@@ -121,7 +121,7 @@ function App() {
                 <div className="columns" style={{marginLeft : settings.gutterWidth + settings.stdMargin}}>
                   {columnArray.map(function(idx) {
                     return (
-                      <div className="column" style={{width : columnWidth + 'px', height : lineHeight + 'px'}}>
+                      <div key={key.toString() + '-' + idx.toString()} className="column" style={{width : columnWidth + 'px', height : lineHeight + 'px'}}>
                         {subDivisionArray.map(function(subDivIdx) {
                           const backgroundColor = (key > (currentHours - 1) && subDivIdx + 1 > currentMinutes / 10)
                             || key > (currentDate.getHours())
@@ -129,7 +129,7 @@ function App() {
                               : 'transparent';
                           // keep the node to have the correct background, but don't set the border to avoir rounding issues on the last line
                           return (
-                            <div className="sub-division" style={{
+                            <div key={key.toString() + '-' + idx.toString() + '-' + subDivIdx.toString()} className="sub-division" style={{
                               width : (columnWidth - 2) + 'px',
                               height : lineHeight / 6 + 'px',
                               backgroundColor : backgroundColor,
@@ -154,7 +154,7 @@ function App() {
         {streamsData.map(function(streamData) {
           if (activeColumns[streamData.stream_channel])
             return <StreamCard
-              key={streamData.title}
+              key={streamData.title + '-' + streamData.subtitle}
               todayMidnight={todayMidnight}
               livestreamDesc={streamData}
               columnWidth={columnWidth}

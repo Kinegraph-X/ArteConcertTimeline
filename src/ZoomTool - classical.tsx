@@ -2,6 +2,16 @@ import './types.ts';
 import { useState, useLayoutEffect, useEffect } from 'react';
 import settings from './constants/settings.ts';
 
+const debounce = <F extends (args: any) => any> (func:F, delay:number) => {
+    let debounceTimer:NodeJS.Timeout;
+    return function(...args:Parameters<F>) {
+        // @ts-ignore
+      const context = this;
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => func.apply(context, args), delay);
+    } as (...args: Parameters<F>) => ReturnType<F>;
+  };
+
 let initialZoomLevel:number,
     buttonTopCoordState:number = 0,
     middleClickOffset:number,
@@ -26,13 +36,13 @@ const scrollMoveHandler = (moveEvent:MouseEvent) => {
 
 const bottomZoomMoveHandler = (moveEvent:MouseEvent) => {
     const moveOffset = moveEvent.clientY - lastClickMoveOffset;
-    if (buttonTopCoordState >= 0)
+    if ((buttonTopCoordState >= 0 || moveOffset < 0) && buttonTopCoordState + tempButtonHeight <= settings.zoomToolInitialSize.height - settings.stdPadding * 2)
         tempButtonHeight += moveOffset * 2;
     else
         tempButtonHeight += moveOffset;
     const newZoomLevel = settings.zoomButtonInitialSize.height / tempButtonHeight;
     if (newZoomLevel >= 1 && tempButtonHeight > settings.zoomInnerButtonInitialSize.height * 3) {
-        if (buttonTopCoordState >= 0) {
+        if (buttonTopCoordState >= 0 || moveOffset < 0) {
             buttonTopCoordState -= moveOffset;
             setButtonTopCoord(buttonTopCoordState)
         }
@@ -48,13 +58,13 @@ const bottomZoomMoveHandler = (moveEvent:MouseEvent) => {
 
 const topZoomMoveHandler = (moveEvent:MouseEvent) => {
     const moveOffset = moveEvent.clientY - lastClickMoveOffset;
-    if (buttonTopCoordState + tempButtonHeight <= settings.zoomToolInitialSize.top + settings.zoomToolInitialSize.height - settings.stdPadding * 2)
+    if ((buttonTopCoordState >= 0 || moveOffset > 0) && buttonTopCoordState + tempButtonHeight <= settings.zoomToolInitialSize.height - settings.stdPadding * 2)
         tempButtonHeight += -moveOffset * 2;
     else
         tempButtonHeight += -moveOffset;
     const newZoomLevel = settings.zoomButtonInitialSize.height / tempButtonHeight;
     if (newZoomLevel >= 1 && tempButtonHeight > settings.zoomInnerButtonInitialSize.height * 3) {
-        if (buttonTopCoordState >= 0) {
+        if (buttonTopCoordState >= 0 || moveOffset > 0) {
             buttonTopCoordState += moveOffset;
             setButtonTopCoord(buttonTopCoordState)
         }
@@ -74,7 +84,7 @@ const updateScrollWhenZoom = function(newZoomLevel:number) {
             newScroll = (componentProps.currentScrollPosition + window.innerHeight) * scrollChangeRatio - window.innerHeight;
         componentProps.setCurrentScrollPosition(newScroll);
     }
-}
+};
 
 const handleZoomToolMiddleButtonOnMouseDown = (e:React.MouseEvent<HTMLDivElement>) => {
     middleClickOffset = e.clientY - buttonTopCoord;
@@ -179,6 +189,7 @@ function getMiddleButtonMarginTop (zoomLevel:number) {
 function getBottomButtonMarginTop (zoomLevel:number) {
     return (getMainButtonHeight(zoomLevel) - settings.stdPadding * 2) - settings.zoomInnerButtonInitialSize.height;
 }
+
 
 
 
