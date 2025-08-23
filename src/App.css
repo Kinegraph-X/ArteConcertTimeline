@@ -25,7 +25,7 @@ body {
   position : absolute;
   display : flex;
   align-items : center;
-  justify-content : center;
+  justify-content : space-between;
   background-color: #242424;
   top : 0;
   left : 0;
@@ -36,20 +36,20 @@ body {
 }
 
 .title {
-  position : absolute;
   background-image : url('images/arte_concert_timeline.png');
-  background-position: center;
+  background-position: -16px;
   background-repeat: no-repeat;
-  top : 5px;
-  left : 0;
-  width: 357px;
+  width: 244px;
   height: 38px;
 }
 
+.column-selectors {
+  display: flex;
+  width: 464px;
+}
+
 .hint {
-  position : absolute;
-  top : 1px;
-  right : 5px;
+  margin-right : 5px;
   font-size : 12px;
 }
 
@@ -74,6 +74,7 @@ body {
 }
 
 .line.hour {
+  position : absolute;
   border : 1px #363636 solid;
   border-width : 1px 0px 0px 0px;
 }
@@ -86,28 +87,46 @@ body {
 }
 
 .line.hour .day-text {
+  display : none;
   font-size : 14px;
   font-weight : bold;
   padding : 4px;
 }
 
+.line.hour.new-day .day-text {
+  display : block;
+}
+
 .line.hour .columns {
-  margin-top : -42px;
+  margin-top : -11.5px;
+}
+
+.line.hour.new-day .columns {
+  margin-top : -40.5px;
 }
 
 .line.hour .column {
   display : inline-block;
   border: 1px #363636 solid;
-  border-width : 0px 1px 0px 0px
+  border-width : 0px 1px 0px 0px;
 }
 
 .line.hour .column:first-child {
-  border-width : 0px 1px 0px 1px
+  border-width : 0px 1px 0px 1px;
 }
 
 .line.hour .sub-division {
+  background-color : transparent;
   border: 1px #303030 solid;
-  border-width : 0px 0px 1px 0px
+  border-width : 0px 0px 1px 0px;
+}
+
+.line.hour .sub-division:last-child {
+  border-width : 0px;
+}
+
+.line.hour .sub-division.after-now {
+  background-color : #262626;
 }
 
 .zoom-tool  {
@@ -180,6 +199,7 @@ label.for-checkbox {
   background-color : #202020;
   width : 34px;
   height : 18px;
+  margin-top : 3px;
   margin-left : 5px;
   border-radius : 9px;
   border : 1px #555 inset;
@@ -222,4 +242,8 @@ label.for-checkbox {
   border-left : 10px solid #A22;
  }
  
- 
+ @media (max-width: 1160px) {
+  .column-selectors {
+    display : none;
+  }
+ }

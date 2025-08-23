@@ -88,7 +88,6 @@ type settings = {
     stdCardDuration : number,
     cardThumbnailImgHeight : number,
     cardThumbnailImgwidth : number,
-    upcomingGridColor : string,
     zoomToolInitialSize : extendedDimension,
     zoomButtonInitialSize : dimension,
     zoomInnerButtonInitialSize : dimension

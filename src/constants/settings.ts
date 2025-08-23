@@ -13,7 +13,6 @@ const settings:settings = {
 	stdCardDuration : 110 * 60,
 	cardThumbnailImgwidth : 380,
 	cardThumbnailImgHeight : 214,
-	upcomingGridColor : '#262626',
 	zoomToolInitialSize : {
 		top : 64,
 		right : 24,

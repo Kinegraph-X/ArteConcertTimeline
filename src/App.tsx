@@ -7,6 +7,7 @@ import StreamCard from './StreamCard.tsx';
 import RoundCheckbox from './RoundCheckbox.tsx';
 
 const hoursInADay = 24;
+const previousVisibleHours = 5;
 const pageWidthPreCalc = settings.gutterWidth + settings.zoomToolInitialSize.width + settings.zoomToolInitialSize.right + settings.stdPadding * 2 + settings.stdMargin * 2;
 
 /*
@@ -38,8 +39,13 @@ function App() {
       let backendUrl = '';
       if (window.location.href.match(/localhost/))
         backendUrl = 'http://localhost:80';
-
-      fetch(backendUrl + '/_arteconcert_dom_crawler/dom_crawler.php').then((response) => { // http://localhost:80
+      fetch(backendUrl + '/_arteconcert_dom_crawler/dom_crawler.php').then((response) => {
+        if (!response.ok) {
+          response.text().then((txt) => {
+            console.error('The server responded : ' + txt);
+          });
+        	return;
+        }
         response.json().then((data:streamData[]) => {
           setStreamsData(data);
         });
@@ -68,20 +74,19 @@ function App() {
   /*
    * define initial values : dates and scroll
   */
-  let currentDate = new Date();
-  // Handle the case where we are just after midnight, and allow seeing the previous day to be able to monitor streams crossing midnight
-  if (currentDate.getHours() < 5)
-    currentDate = new Date(`${currentDate.getMonth() + 1}-${currentDate.getDate() - 1}-${currentDate.getFullYear()}`);
-
-  const todayMidnight = new Date(`${currentDate.getMonth() + 1}-${currentDate.getDate()}-${currentDate.getFullYear()}`).getTime();
+  const currentDate = new Date();
+  const DSTOffset =  - currentDate.getTimezoneOffset() / 60;
+  const startTimestamp = `${currentDate.getFullYear()}-${(currentDate.getMonth() + 1).toString().padStart(2, '0')}-${currentDate.getDate()}T${currentDate.getHours() - previousVisibleHours}:00:00.000+0${DSTOffset}:00`;
+  const startDate = new Date(startTimestamp);
+    
   const displayedHour = currentDate.getHours().toString().padStart(2, '0') + ':' + currentDate.getMinutes().toString().padStart(2, '0');
-
-  const initialScroll = Math.max((currentDate.getTime() - todayMidnight) * settings.originalLineHeight / 3600000 - window.innerHeight / 2, 0);
+	
+  const initialScroll = (currentDate.getTime() - startDate.getTime()) * settings.originalLineHeight / 3600000 - window.innerHeight / 2;
   const [currentScrollPosition, setCurrentScrollPosition] = useState(initialScroll);
   const pageTotalHeight = lineDescriptors.length * lineHeight;
   
   /*
-   * Mockup of dynamic fake arrays
+   * Some preparation for the grid
   */
   const columnArray:number[] = [];
   for (let i = 0, l = currentColumnCount; i < l; i++) {
@@ -94,46 +99,56 @@ function App() {
     <Fragment>
       <header id="site-header" style={{height : settings.headerHeight + 'px'}}>
         <div className="title"></div>
-        Visible Channels : 
-        {buttonArray.map(function(idx) {
-          return <RoundCheckbox 
-              label={idx}
-              activeColumns={activeColumns}
-              setActiveColumns={setActiveColumns}
-              currentColumnCount={currentColumnCount}
-              setCurrentColumnCount={setCurrentColumnCount}
-            />;
-        })}
+        <div className="column-selectors">
+          <span>Visible Channels&nbsp;: </span>
+          {buttonArray.map(function(idx) {
+            return <RoundCheckbox 
+                key = {idx}
+                label={idx}
+                activeColumns={activeColumns}
+                setActiveColumns={setActiveColumns}
+                currentColumnCount={currentColumnCount}
+                setCurrentColumnCount={setCurrentColumnCount}
+              />;
+          })}
+        </div>
         <div className="hint">
           <div><span className="yellow">Yellow</span> programs are VOD's, the date from the API is randomized for demo purposes</div>
           <div className="second"><span className="green">Green</span> programs are livestreams, they're placed at the time they'll start</div>
         </div>
       </header>
 
-      <section id="grid-element" style={{marginTop: (- currentScrollPosition + settings.headerHeight + settings.stdMargin).toString() + "px"}}>
+      <section id="grid-element" style={{
+            height : pageTotalHeight + 'px',
+            marginTop: (- currentScrollPosition + settings.headerHeight + settings.stdMargin).toString() + "px"
+          }}>
         {lineDescriptors.map(function(lineDescriptor, key) {
-          const currentHour = getHourOfDay(key);
+          const currentHour = getHourOfDay(key + currentDate.getHours() - previousVisibleHours);
             return (
-              <div key={key} className="line hour" style={{height : lineHeight + 'px'}} aria-hidden>
+              <div key={key} 
+                  className={`line hour ${currentHour === 0 ? 'new-day' : ''}`}
+                  style={{top : (key * pageTotalHeight / 72) + 'px', height : lineHeight + 'px'}}
+                  aria-hidden>
                 
                 <div className="hour-text">{currentHour.toString().padStart(2, '0')}:00</div>
-                <div className="day-text" style={{opacity : currentHour === 0 ? '1' : '0'}}>{getCurrentDay(key, todayMidnight)}</div>
+                <div className="day-text" >{getCurrentDay(currentHour, startDate.getTime())}</div>
                 <div className="columns" style={{marginLeft : settings.gutterWidth + settings.stdMargin}}>
                   {columnArray.map(function(idx) {
                     return (
-                      <div key={key.toString() + '-' + idx.toString()} className="column" style={{width : columnWidth + 'px', height : lineHeight + 'px'}}>
+                      <div key={key.toString() + '-' + idx.toString()}
+                          className="column"
+                          style={{width : columnWidth + 'px', height : lineHeight + 'px'}}>
                         {subDivisionArray.map(function(subDivIdx) {
-                          const backgroundColor = (key > (currentHours - 1) && subDivIdx + 1 > currentMinutes / 10)
-                            || key > (currentDate.getHours())
-                              ? settings.upcomingGridColor
-                              : 'transparent';
-                          // keep the node to have the correct background, but don't set the border to avoir rounding issues on the last line
                           return (
-                            <div key={key.toString() + '-' + idx.toString() + '-' + subDivIdx.toString()} className="sub-division" style={{
+                            <div key={key.toString() + '-' + idx.toString() + '-' + subDivIdx.toString()} 
+                              className={`sub-division ${
+                                (currentHour > (currentHours - 1) && subDivIdx + 1 > currentMinutes / 10) || key > currentDate.getHours() - startDate.getHours()
+                                  ? 'after-now'
+                                  : ''
+                                }`}
+                              style={{
                               width : (columnWidth - 2) + 'px',
                               height : lineHeight / 6 + 'px',
-                              backgroundColor : backgroundColor,
-                              borderWidth : idx < 5 ? '0px 0px 1px 0px' : '0px'
                             }}></div>
                           )
                         })}
@@ -144,18 +159,18 @@ function App() {
               </div>
             )
         })}
-        <section className="displayed-hour" style={{top : (((currentDate.getTime() - todayMidnight) / 1000) * lineHeight / 3600 - settings.displayedHourHeight / 2) + 'px'}}>
+        <section className="displayed-hour" style={{top : (((currentDate.getTime() - startDate.getTime()) / 1000) * lineHeight / 3600 - settings.displayedHourHeight / 2) + 'px'}}>
           {displayedHour}
         </section>
-        <div id="triangle" style={{top : (((currentDate.getTime() - todayMidnight) / 1000) * lineHeight / 3600 - settings.triangleHeight / 2) + 'px'}}></div>
+        <div id="triangle" style={{top : (((currentDate.getTime() - startDate.getTime()) / 1000) * lineHeight / 3600 - settings.triangleHeight / 2) + 'px'}}></div>
       </section>
 
       <section id='streams-overlay' style={{top : (settings.headerHeight + settings.stdMargin) + 'px', marginTop: (- currentScrollPosition).toString() + "px"}}>
         {streamsData.map(function(streamData) {
-          if (activeColumns[streamData.stream_channel])
+          if (activeColumns[streamData.stream_channel] && streamData.date + streamData.duration > startDate.getTime() / 1000)
             return <StreamCard
               key={streamData.title + '-' + streamData.subtitle}
-              todayMidnight={todayMidnight}
+              todayMidnight={startDate.getTime()}
               livestreamDesc={streamData}
               columnWidth={columnWidth}
               lineHeight = {lineHeight}
@@ -186,6 +201,7 @@ function getHourOfDay(idx:number) {
 function getCurrentDay(idx:number, todayMidnight:number) {
   const daysElapsed = Math.floor(idx / hoursInADay);
   return (new Date(todayMidnight + daysElapsed * 3600 * 24 * 1000)).toLocaleDateString();
+  // return (new Date(startDate + daysElapsed * 3600 * 24 * 1000)).toLocaleDateString();
 }
 
 export default App

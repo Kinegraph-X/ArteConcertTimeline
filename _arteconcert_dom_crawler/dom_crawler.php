@@ -64,7 +64,9 @@ $offseted_hours = [
 $crawler = new Crawler($output);
 $events = [];
 $crawler->filter('li[data-testid="tsguide-itm"]')->each(function (Crawler $node) use (&$events) {
-    if ($node->filter('div[data-testid="sticker-livestream"]')->count() > 0) {
+    if ($node->filter('div[data-testid="sticker-livestream"]')->count() > 0
+        // not  at all reliable, but other selectors are more abstract
+            || $node->filter('picture')->count() > 0) {
 //         echo '<pre>'.$node->text().'</pre>';
         setEvent($node);
     }
