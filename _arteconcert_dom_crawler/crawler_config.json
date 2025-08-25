@@ -1,0 +1,4 @@
+{
+	"cache_lifetime" : 3600,
+	"cache_file_name" : "events_cache.json"
+}

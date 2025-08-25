@@ -1,6 +1,8 @@
 # Arte Concert Timeline
 
-> Originally started as an internal prototype at Arte to centralize **data-driven visualization** of concerts.
+> Originally started as an internal prototype at Arte to centralize **data-driven visualization** of concerts,  
+> born from the fact that technicians lacked such a user-friendly tool.  
+> Even as a demo, some technicians used it in live monitoring.
 
 So it's a re-implementation of an old project, now built with **Vite + React + TypeScript**.  
 It scrapes the [arte.tv](https://www.arte.tv) website to retrieve the list of upcoming livestreams, and lays them out on an interactive **timeline view**.
@@ -8,10 +10,10 @@ It scrapes the [arte.tv](https://www.arte.tv) website to retrieve the list of up
 ## Features
 
 - Clearly shows upcoming events and how they overlap.
+- Automatic scraping of livestreams (cached hourly, frequency configurable via config file).
 - Complete streams metadata are present.  
   (The earlier version also launched the Arte video player when a stream started.  
   This was intentionally removed here, since the player is proprietary and would require constant reverse-engineering to keep in sync.)
-- Automatic scraping of livestreams (cached hourly, frequency configurable via config file).
 - Live updating of the current time marker.
 - Zoom & navigation tool inspired by video editing software.
 - UI focused on content rather than interface chrome.
