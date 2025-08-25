@@ -1,5 +1,5 @@
 import './types.ts';
-import { useEffect, useState, Fragment } from 'react';
+import { useEffect, useState, useMemo, Fragment } from 'react';
 import settings from './constants/settings.ts';
 import './App.css';
 import ZoomTool from './ZoomTool - classical.tsx';
@@ -50,11 +50,12 @@ function App() {
         });
       });
     }
-    setInterval(fetchFunction, 10 * 1000);
+    const appRefreshInterval = setInterval(fetchFunction, 10 * 1000);
     fetchFunction();
     addEventListener("resize", (event) => {
       setColumnWidth((window.innerWidth - pageWidthPreCalc) / currentColumnCount);
     });
+    return () => clearInterval(appRefreshInterval);
   }, []);
 
   const [streamsData, setStreamsData] = useState([] as streamData[]);
@@ -87,10 +88,11 @@ function App() {
   /*
    * Some preparation for the grid
   */
-  const columnArray:number[] = [];
-  for (let i = 0, l = currentColumnCount; i < l; i++) {
-    columnArray.push(i);
-  }
+  const columnArray = useMemo(
+    () => Array.from({ length: currentColumnCount }, (_, i) => i),
+    [currentColumnCount]
+  );
+  
   const currentHours = currentDate.getHours();
   const currentMinutes = currentDate.getMinutes();
 
