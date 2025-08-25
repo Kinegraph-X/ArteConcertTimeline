@@ -5,7 +5,7 @@
 > Even as a demo, some technicians used it in live monitoring.
 
 So it's a re-implementation of an old project, now built with **Vite + React + TypeScript**.  
-It scrapes the [arte.tv](https://www.arte.tv) website to retrieve the list of upcoming livestreams, and lays them out on an interactive **timeline view**.
+It scrapes the [arte.tv](https://www.arte.tv/fr/arte-concert/agenda) website to retrieve the list of upcoming livestreams, and lays them out on an interactive **timeline view**.
 
 ## Features
 
