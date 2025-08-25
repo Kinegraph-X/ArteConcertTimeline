@@ -2,15 +2,50 @@ import './types.ts';
 import { useState, useLayoutEffect, useEffect } from 'react';
 import settings from './constants/settings.ts';
 
-const debounce = <F extends (args: any) => any> (func:F, delay:number) => {
-    let debounceTimer:NodeJS.Timeout;
-    return function(...args:Parameters<F>) {
-        // @ts-ignore
-      const context = this;
-      clearTimeout(debounceTimer);
-      debounceTimer = setTimeout(() => func.apply(context, args), delay);
-    } as (...args: Parameters<F>) => ReturnType<F>;
-  };
+// const debounce = <F extends (args: any) => any> (func:F, delay:number) => {
+//     let debounceTimer:NodeJS.Timeout;
+//     return function(...args:Parameters<F>) {
+//         // @ts-ignore
+//       const context = this;
+//       clearTimeout(debounceTimer);
+//       debounceTimer = setTimeout(() => func.apply(context, args), delay);
+//     } as (...args: Parameters<F>) => ReturnType<F>;
+//   };
+
+/**
+ * ⚠️ Note for future maintainers:
+ *
+ * This component uses module-scope mutable variables to hold derived values
+ * (instead of React state or refs). On every render, these variables are
+ * reassigned from the current props/state, so they never go stale and never
+ * cause side effects between renders.
+ *
+ * Why is this okay here?
+ * - Because the values are always overwritten on each render, they stay
+ *   consistent with the latest props/state during that render pass.
+ * - Even with multiple instances, React renders components one at a time, so
+ *   no two instances "race" while traversing the tree.
+ * - All functions consuming these values are pure math (no hidden side effects).
+ * - React’s render cycle isn’t bypassed — nothing external depends on these
+ *   variables outside the component’s render context.
+ *
+ * Why is this considered “non-idiomatic” in React?
+ * - React cannot "see" or track these globals, so the data flow looks unusual
+ *   compared to conventional hooks like useState/useRef/useMemo.
+ * - Other React developers might expect idiomatic patterns and be surprised.
+ *
+ * If this app were to grow (multiple instances, reuse by others), a more
+ * idiomatic approach would be:
+ * - Use `useRef` to store mutable non-visual state that persists across renders.
+ * - Use `useMemo` for derived values from props.
+ * - Or centralize the zoom state in context or a store if multiple components
+ *   needed to coordinate.
+ *
+ * In short: this is a pragmatic, lean hack that works fine for this specific
+ * case. If the scope expands, it should be refactored toward idiomatic React
+ * patterns for clarity and maintainability.
+ */
+
 
 let initialZoomLevel:number,
     buttonTopCoordState:number = 0,
