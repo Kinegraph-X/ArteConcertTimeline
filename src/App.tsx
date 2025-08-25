@@ -7,11 +7,10 @@ import StreamCard from './StreamCard.tsx';
 import RoundCheckbox from './RoundCheckbox.tsx';
 
 const hoursInADay = 24;
-const previousVisibleHours = 5;
 const pageWidthPreCalc = settings.gutterWidth + settings.zoomToolInitialSize.width + settings.zoomToolInitialSize.right + settings.stdPadding * 2 + settings.stdMargin * 2;
 
 /*
-* Mockup of static fake arrays
+* Static arrays for the grid
 */
 const lineDescriptors:lineDescriptor[] = [];
 (function initLines() {
@@ -21,7 +20,7 @@ const lineDescriptors:lineDescriptor[] = [];
 })()
 
 const subDivisionArray:number[] = [];
-for (let i = 0, l = 6; i < l; i++) {
+for (let i = 0, l = settings.hourSubdivisions; i < l; i++) {
   subDivisionArray.push(i);
 }
 
@@ -65,7 +64,7 @@ function App() {
   const [columnWidth, setColumnWidth] = useState((window.innerWidth - pageWidthPreCalc) / currentColumnCount);
 
   useEffect(function() {
-    setColumnWidth((window.innerWidth - pageWidthPreCalc) / currentColumnCount);
+      setColumnWidth((window.innerWidth - pageWidthPreCalc) / currentColumnCount);
   }, [currentColumnCount]);
   useEffect(function() {
     setCurrentColumnCount(activeColumns.filter((isActive) => isActive === true).length);
@@ -75,9 +74,9 @@ function App() {
    * define initial values : dates and scroll
   */
   const currentDate = new Date();
-  const DSTOffset =  - currentDate.getTimezoneOffset() / 60;
-  const startTimestamp = `${currentDate.getFullYear()}-${(currentDate.getMonth() + 1).toString().padStart(2, '0')}-${currentDate.getDate()}T${currentDate.getHours() - previousVisibleHours}:00:00.000+0${DSTOffset}:00`;
-  const startDate = new Date(startTimestamp);
+  const startDate = new Date(currentDate.getTime());
+  startDate.setHours(currentDate.getHours() - settings.previousVisibleHours);
+  startDate.setMinutes(0, 0, 0);
     
   const displayedHour = currentDate.getHours().toString().padStart(2, '0') + ':' + currentDate.getMinutes().toString().padStart(2, '0');
 	
@@ -123,41 +122,45 @@ function App() {
             marginTop: (- currentScrollPosition + settings.headerHeight + settings.stdMargin).toString() + "px"
           }}>
         {lineDescriptors.map(function(lineDescriptor, key) {
-          const currentHour = getHourOfDay(key + currentDate.getHours() - previousVisibleHours);
-            return (
-              <div key={key} 
-                  className={`line hour ${currentHour === 0 ? 'new-day' : ''}`}
-                  style={{top : (key * pageTotalHeight / 72) + 'px', height : lineHeight + 'px'}}
-                  aria-hidden>
-                
-                <div className="hour-text">{currentHour.toString().padStart(2, '0')}:00</div>
-                <div className="day-text" >{getCurrentDay(currentHour, startDate.getTime())}</div>
-                <div className="columns" style={{marginLeft : settings.gutterWidth + settings.stdMargin}}>
-                  {columnArray.map(function(idx) {
-                    return (
-                      <div key={key.toString() + '-' + idx.toString()}
-                          className="column"
-                          style={{width : columnWidth + 'px', height : lineHeight + 'px'}}>
-                        {subDivisionArray.map(function(subDivIdx) {
-                          return (
-                            <div key={key.toString() + '-' + idx.toString() + '-' + subDivIdx.toString()} 
-                              className={`sub-division ${
-                                (currentHour > (currentHours - 1) && subDivIdx + 1 > currentMinutes / 10) || key > currentDate.getHours() - startDate.getHours()
-                                  ? 'after-now'
-                                  : ''
-                                }`}
-                              style={{
+          const elapsedHours = key + currentDate.getHours() - settings.previousVisibleHours;
+          const currentHour = getHourOfDay(elapsedHours + hoursInADay);   // Avoid negative values when crossing midnight
+          
+          return (
+            <div key={key} 
+                className={`line hour ${currentHour === 0 ? 'new-day' : ''}`}
+                style={{top : (key * pageTotalHeight / 72) + 'px', height : lineHeight + 'px'}}
+                aria-hidden
+                >
+              <div className="hour-text">{currentHour.toString().padStart(2, '0')}:00</div>
+              <div className="day-text" >{getCurrentDay(elapsedHours, currentDate)}</div>
+              <div className="columns" style={{marginLeft : settings.gutterWidth + settings.stdMargin}}>
+                {columnArray.map(function(idx) {
+                  return (
+                    <div key={key.toString() + '-' + idx.toString()}
+                        className="column"
+                        style={{width : columnWidth + 'px', height : lineHeight + 'px'}}
+                        >
+                      {subDivisionArray.map(function(subDivIdx) {
+                        return (
+                          <div key={key.toString() + '-' + idx.toString() + '-' + subDivIdx.toString()} 
+                            className={`sub-division ${
+                              startDate.getTime() + key * 3600 * 1000 + (subDivIdx + 1) * (60 / settings.hourSubdivisions) * 60 * 1000 > currentDate.getTime()
+                                ? 'after-now'
+                                : ''
+                              }`}
+                            style={{
                               width : (columnWidth - 2) + 'px',
                               height : lineHeight / 6 + 'px',
-                            }}></div>
-                          )
-                        })}
-                      </div>
-                    );
-                  })}
-                </div>
+                            }}>
+                          </div>
+                        )
+                      })}
+                    </div>
+                  );
+                })}
               </div>
-            )
+            </div>
+          )
         })}
         <section className="displayed-hour" style={{top : (((currentDate.getTime() - startDate.getTime()) / 1000) * lineHeight / 3600 - settings.displayedHourHeight / 2) + 'px'}}>
           {displayedHour}
@@ -198,10 +201,8 @@ function getHourOfDay(idx:number) {
     return idx % hoursInADay;
 }
 
-function getCurrentDay(idx:number, todayMidnight:number) {
-  const daysElapsed = Math.floor(idx / hoursInADay);
-  return (new Date(todayMidnight + daysElapsed * 3600 * 24 * 1000)).toLocaleDateString();
-  // return (new Date(startDate + daysElapsed * 3600 * 24 * 1000)).toLocaleDateString();
+function getCurrentDay(elapsedHours:number, startDate:Date) {
+  return (new Date(startDate.getTime() + elapsedHours * 3600 * 1000)).toLocaleDateString();
 }
 
 export default App

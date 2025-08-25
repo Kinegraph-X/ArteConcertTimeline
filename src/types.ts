@@ -77,7 +77,9 @@ type RoundCheckboxProps = {
 
 type settings = {
 	days : number,
+    previousVisibleHours : number,
     initialColumnCount : number,
+    hourSubdivisions : number,
     headerHeight : number,
     gutterWidth : number,
 	originalLineHeight : number,

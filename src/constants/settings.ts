@@ -2,7 +2,9 @@ import '../types.ts';
 
 const settings:settings = {
 	days : 3,
+	previousVisibleHours : 5,
 	initialColumnCount : 4,
+	hourSubdivisions : 6,
 	headerHeight : 49,
 	originalLineHeight : 124,
 	gutterWidth : 84,
