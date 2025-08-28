@@ -46,6 +46,7 @@ function App() {
         	return;
         }
         response.json().then((data:streamData[]) => {
+          normalizeStreamsData(data);
           setStreamsData(data);
         });
       });
@@ -95,6 +96,13 @@ function App() {
   
   const currentHours = currentDate.getHours();
   const currentMinutes = currentDate.getMinutes();
+
+  // const testArray:number[] = [];
+  // streamsData.forEach(function(streamData) {
+  //   testArray.push(streamData.date + streamData.duration);
+  // });
+  // testArray.sort();
+  // console.log(testArray);
 
   return (
     <Fragment>
@@ -172,6 +180,7 @@ function App() {
 
       <section id='streams-overlay' style={{top : (settings.headerHeight + settings.stdMargin) + 'px', marginTop: (- currentScrollPosition).toString() + "px"}}>
         {streamsData.map(function(streamData) {
+          // Avoid rendering streames ending before startDate
           if (activeColumns[streamData.stream_channel] && streamData.date + streamData.duration > startDate.getTime() / 1000)
             return <StreamCard
               key={streamData.title + '-' + streamData.subtitle}
@@ -182,7 +191,8 @@ function App() {
               currentColumnCount={currentColumnCount}
               activeColumns={activeColumns}
             />
-        })}
+        })
+        }
       </section>
       
       <ZoomTool
@@ -205,6 +215,14 @@ function getHourOfDay(idx:number) {
 
 function getCurrentDay(elapsedHours:number, startDate:Date) {
   return (new Date(startDate.getTime() + elapsedHours * 3600 * 1000)).toLocaleDateString();
+}
+
+function normalizeStreamsData(streamsData) {
+  streamsData.forEach(function(streamData) {
+    if (streamData.duration > settings.maxCardDuration) {
+      streamData.duration = settings.stdCardDuration;
+    }
+  });
 }
 
 export default App

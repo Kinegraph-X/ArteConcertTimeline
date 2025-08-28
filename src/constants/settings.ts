@@ -13,6 +13,8 @@ const settings:settings = {
 	displayedHourHeight : 46,
 	triangleHeight : 12,
 	stdCardDuration : 110 * 60,
+	// 100 is arbitrary, as is the data we get from the API 
+	maxCardDuration : 240 * 60,
 	cardThumbnailImgwidth : 380,
 	cardThumbnailImgHeight : 214,
 	zoomToolInitialSize : {

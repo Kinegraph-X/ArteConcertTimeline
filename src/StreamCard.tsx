@@ -4,7 +4,7 @@ import settings from './constants/settings.ts';
 
 const StreamCard = function(props:streamCardProps) {
     
-    // console.log(props.livestreamDesc.date - props.todayMidnight / 1000,  props.lineHeight / 3600);
+    // Eventual fix some inconsistencies from the scraper (for top pixels : the source page doesn't give us a "clean" dataset)
     const streamCardStyle = {
         top : (props.livestreamDesc.date !== null 
             ? ((props.livestreamDesc.date - props.todayMidnight / 1000) * props.lineHeight / 3600) 
@@ -16,9 +16,7 @@ const StreamCard = function(props:streamCardProps) {
             )
             + 'px',
         width : props.columnWidth + 'px',
-        height : props.livestreamDesc.duration < 20  * 60 || props.livestreamDesc.duration > 240  * 60
-            ? props.lineHeight * settings.stdCardDuration / 3600
-            : props.lineHeight * props.livestreamDesc.duration / 3600
+        height : props.lineHeight * props.livestreamDesc.duration / 3600
     }
     // console.log(
     //     props.livestreamDesc.title,
